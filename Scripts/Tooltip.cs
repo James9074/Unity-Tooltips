@@ -8,14 +8,12 @@ using System;
 public class Tooltip : MonoBehaviour
 {
     public static Tooltip Instance;
-
-
+    
     //Text of the tooltip
     Text mText;
 
-    //if the tooltip is inside a UI element
-    [SerializeField]
-    bool mInside;
+    //If the tooltip is active and should render
+    bool mActive;
     
     [SerializeField]
     float mWidth;
@@ -32,12 +30,14 @@ public class Tooltip : MonoBehaviour
     float mXShift;
 
     RectTransform mCornerImage;
+    RectTransform mRectTransform;
     RenderMode mGUIMode;
     CanvasScaler mScaler;
 
     void Awake()
     {
         Instance = this;
+        mRectTransform = transform.GetComponent<RectTransform>();
     }
 
     void Start()
@@ -60,20 +60,20 @@ public class Tooltip : MonoBehaviour
             if (aMaxWidth != 0)
             {
                 mText.horizontalOverflow = HorizontalWrapMode.Wrap;
-                mText.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(aMaxWidth, 100);
-                this.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(aMaxWidth + 60f, mText.preferredHeight + 20f);
+                mText.GetComponent<RectTransform>().sizeDelta = new Vector2(aMaxWidth, 100);
+                mRectTransform.sizeDelta = new Vector2(aMaxWidth + 60f, mText.preferredHeight + 20f);
 
             }
             else
             {
                 mText.horizontalOverflow = HorizontalWrapMode.Overflow;
-                this.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(mText.preferredWidth + 60f, mText.preferredHeight + 20f);
+                mRectTransform.sizeDelta = new Vector2(mText.preferredWidth + 60f, mText.preferredHeight + 20f);
             }
-            mWidth = this.transform.GetComponent<RectTransform>().sizeDelta[0];
-            mHeight = this.transform.GetComponent<RectTransform>().sizeDelta[1];
+            mWidth = mRectTransform.sizeDelta[0];
+            mHeight = mRectTransform.sizeDelta[1];
             
             this.gameObject.SetActive(true);
-            mInside = true;
+            mActive = true;
         }
     }
 
@@ -83,8 +83,8 @@ public class Tooltip : MonoBehaviour
         if (mGUIMode == RenderMode.ScreenSpaceOverlay)
         {
             mText.text = "";
-            this.gameObject.SetActive(false);
-            mInside = false;
+            gameObject.SetActive(false);
+            mActive = false;
         }
     }
 
@@ -93,9 +93,9 @@ public class Tooltip : MonoBehaviour
         mCanvasWidth = transform.parent.GetComponent<RectTransform>().rect.width;
         mCanvasHeight = transform.parent.GetComponent<RectTransform>().rect.height;
 
-        mWidth = this.transform.GetComponent<RectTransform>().sizeDelta[0];
-        mHeight = this.transform.GetComponent<RectTransform>().sizeDelta[1];
-        if (mInside)
+        mWidth = mRectTransform.sizeDelta[0];
+        mHeight = mRectTransform.sizeDelta[1];
+        if (mActive)
         {
             //ScreenSpaceOverlay Tooltip
             if (mGUIMode == RenderMode.ScreenSpaceOverlay)
@@ -106,19 +106,15 @@ public class Tooltip : MonoBehaviour
                 if (Input.mousePosition.x > Screen.width / 2f)
                 {
                     mXShift = mWidth / 2 + 1;
-                    
-
                     //Determine Y Shift
                     if (Input.mousePosition.y > Screen.height / 2f)
                     {
-
                         //mBGTR;
                         mCornerImage.anchorMin = new Vector2(1,1);
                         mCornerImage.anchorMax = new Vector2(1,1);
                         mCornerImage.localRotation = Quaternion.Euler(0, 0, 270);
                         mCornerImage.anchoredPosition = Vector2.zero;
                         mYShift = mHeight / 2 + 1;
-                        
                     }
                     else
                     {
@@ -129,7 +125,6 @@ public class Tooltip : MonoBehaviour
                         mCornerImage.anchoredPosition = Vector2.zero;
                         mYShift = -mHeight / 2 - 1;
                     }
-                    
                 }
                 else
                 {
@@ -143,7 +138,6 @@ public class Tooltip : MonoBehaviour
                         mCornerImage.localRotation = Quaternion.Euler(0, 0, 0);
                         mCornerImage.anchoredPosition = Vector2.zero;
                         mYShift = mHeight / 2 + 1;
-
                     }
                     else
                     {
@@ -160,23 +154,17 @@ public class Tooltip : MonoBehaviour
 
                 if (mScaler != null)
                 {
-                    Debug.Log(mScaler.uiScaleMode + " " + mScaler.referenceResolution + " " + Screen.width + "," + Screen.height);
                     //Get the different in our base res and the scaled res
                     Vector2 screenSizeDifference = new Vector2(mScaler.referenceResolution.x - Screen.width, mScaler.referenceResolution.y - Screen.height);
-                    Debug.Log("Difference: " + screenSizeDifference);
                     //newPos = new Vector3(newPos.x - screenSizeDifference.x, newPos.y - screenSizeDifference.y, 0);
                     //Get the ratio?
                     float ratio = Screen.width / mScaler.referenceResolution.x;
                     mXShift *= ratio;
                     mYShift *= ratio;
-                    //newPos = ratio;
-                    Debug.Log("ratio: " + ratio);
                 }
 
-                Vector3 newPos = Input.mousePosition - new Vector3(mXShift, mYShift, 0f);
-                Debug.Log(Input.mousePosition + " - " + newPos + " " + mXShift + " "+ mWidth);
-                
-                this.transform.position = newPos;
+                Vector3 newPos = Input.mousePosition - new Vector3(mXShift, mYShift, 0f);                
+                transform.position = newPos;
             }
         }
     }
