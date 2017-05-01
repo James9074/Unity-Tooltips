@@ -14,3 +14,10 @@ Just import these files into /Assets/Plugins/RotaryDesign/Tooltips and open the 
   <br/>
   <span>To use tooltips at the moment, that "Screen Match Mode" value must be set to the left side (width). I'll fix it soon.</span>
 </p>
+
+
+Contributions
+=======
+Please raise an issue for feature requests, and a PR into master for any contributions with the following:
+<br/>**Summary of changes**
+<br/>**How to test (convince me this won't break existing Juice implementations)**
