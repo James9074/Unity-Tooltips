@@ -1,4 +1,4 @@
-# Unity Tooltips
+# Unity Tooltips [Unmaintained!]
 <p align="center">
   <img src="https://puu.sh/sLnKr/453deff8f0.gif">
   <br/><br/>
